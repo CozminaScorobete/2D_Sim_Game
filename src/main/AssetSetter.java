@@ -18,7 +18,7 @@ public class AssetSetter {
 		gp.obj[0] = new Obj_Cascuta();
 		gp.obj[0].worldX = 15 * gp.tileSize;
 		gp.obj[0].worldY = 7 * gp.tileSize;
-		System.out.println("Object Position: (" + gp.obj[0].worldX + ", " + gp.obj[0].worldY + ")");
+		
 		
 		
 	}

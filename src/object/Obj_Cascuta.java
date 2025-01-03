@@ -8,7 +8,7 @@ public class Obj_Cascuta extends SuperObject{
 	
 	public Obj_Cascuta() {
 		
-		name= "Cacuta";
+		name= "Cascuta";
 		try {
 			
 			image = ImageIO.read(getClass().getResourceAsStream("/objects/cascuta.png"));

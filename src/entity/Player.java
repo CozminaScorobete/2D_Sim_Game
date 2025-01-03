@@ -19,6 +19,8 @@ public class Player extends Entity{
 	public final int screenX;
 	public final int screenY;
 
+	public int hasCascuta = 0;
+	
 	public Player(GamePanel gp, KeyHandler keyH) {
 
 		this.gp = gp;
@@ -32,6 +34,8 @@ public class Player extends Entity{
 		solidArea.x = 16;
 		solidArea.y = 40;
 		solidArea.width = 30; 
+		solidAreaDefaultX = solidArea.x;
+		solidAreaDefaultY = solidArea.y;
 		solidArea.height = 16;
 		
 		setDefaultValues();
@@ -67,7 +71,10 @@ public class Player extends Entity{
 	}
 
 	public void update() {
-	    if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
+
+	   
+		
+		if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {
 	        if (keyH.upPressed) {
 	            direction = "up";
 	           
@@ -87,7 +94,9 @@ public class Player extends Entity{
 	        collisionOn = false;
 	        gp.cChecker.checkTile(this);
 	        
-	        
+	        //check obj collision
+	        int objIndex = gp.cChecker.checkObject(this,true);
+	        pickUpObject(objIndex);
 	        //If collision is False, player can move
 	        
 	        if(collisionOn == false) {
@@ -114,6 +123,25 @@ public class Player extends Entity{
 	            spriteCounter = 0;
 	        }
 	    }
+	}
+	
+	public void pickUpObject(int i) {
+		
+		if(i != 999)
+		{
+			String objectName = gp.obj[i].name;
+			System.out.println(objectName);
+			switch(objectName) {
+			case "Cascuta":
+				hasCascuta++;
+				gp.obj[i] = null;
+				System.out.println(hasCascuta);
+				break;
+			
+			}
+		}
+		
+		
 	}
 
 

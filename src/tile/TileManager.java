@@ -41,6 +41,8 @@ public class TileManager {
 			tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
 			tile[4].collision = true;
 			
+			tile[4].collision = true;
+			
 			tile[1] = new Tile();
 			tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
 			tile[1].collision = true;
@@ -113,6 +115,12 @@ public class TileManager {
 	                screenY = worldY - (gp.worldHeight - gp.screenHeight); // Stop at the bottom edge
 	            }
 
+	            // Check if the tile is water and the player has "Cascuta"
+	            if (tileNum == 4 && gp.player.hasCascuta > 1) { // Assuming 4 represents water
+	                tile[4].collision = false;
+	                 // Decrease the player's "Cascuta"
+	            }
+
 	            // Render tile if it's visible
 	            if (screenX + gp.tileSize > 0 && screenX < gp.screenWidth &&
 	                screenY + gp.tileSize > 0 && screenY < gp.screenHeight) {
@@ -121,6 +129,7 @@ public class TileManager {
 	        }
 	    }
 	}
+
 
 	
 	
