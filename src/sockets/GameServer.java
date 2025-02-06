@@ -6,8 +6,8 @@ import java.util.*;
 
 public class GameServer {
     private ServerSocket serverSocket;
-    private Map<String, PlayerState> players = new HashMap<>();
-    private List<ClientHandler> clients = new ArrayList<>();
+    private final Map<String, PlayerState> players = new HashMap<>();
+    private final List<ClientHandler> clients = new ArrayList<>();
 
     public GameServer(int port) {
         try {
@@ -32,6 +32,7 @@ public class GameServer {
     }
 
     public synchronized void updatePlayer(String playerId, PlayerState state) {
+        System.out.println("Updating player: " + playerId + " to position (" + state.x + ", " + state.y + ")");
         players.put(playerId, state);
         broadcastGameState();
     }
@@ -42,6 +43,7 @@ public class GameServer {
     }
 
     private synchronized void broadcastGameState() {
+        System.out.println("Broadcasting game state to clients...");
         StringBuilder gameState = new StringBuilder();
         for (Map.Entry<String, PlayerState> entry : players.entrySet()) {
             PlayerState state = entry.getValue();
@@ -49,9 +51,9 @@ public class GameServer {
                      .append(state.x).append(",")
                      .append(state.y).append(";");
         }
-        String gameStateMessage = gameState.toString();
+
         for (ClientHandler client : clients) {
-            client.sendMessage(gameStateMessage);
+            client.sendMessage(gameState.toString());
         }
     }
 
@@ -61,8 +63,8 @@ public class GameServer {
     }
 
     private class ClientHandler implements Runnable {
-        private Socket socket;
-        private GameServer server;
+        private final Socket socket;
+        private final GameServer server;
         private PrintWriter out;
         private BufferedReader in;
         private String playerId;
@@ -84,14 +86,14 @@ public class GameServer {
                 String message;
                 while ((message = in.readLine()) != null) {
                     String[] parts = message.split(",");
-                    if (parts[0].equals("MOVE")) {
+                    if (parts.length == 3 && "MOVE".equals(parts[0])) {
                         int x = Integer.parseInt(parts[1]);
                         int y = Integer.parseInt(parts[2]);
                         server.updatePlayer(playerId, new PlayerState(x, y));
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("Player disconnected: " + playerId);
             } finally {
                 server.removePlayer(playerId);
                 try {
@@ -103,7 +105,9 @@ public class GameServer {
         }
 
         public void sendMessage(String message) {
-            out.println(message);
+            if (out != null) {
+                out.println(message);
+            }
         }
     }
 

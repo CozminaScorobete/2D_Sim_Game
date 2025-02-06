@@ -4,8 +4,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JPanel;
 
@@ -17,38 +17,41 @@ import tile.TileManager;
 public class GamePanel extends JPanel implements Runnable {
 
     // SCREEN SETTINGS
-    final int originalTileSize = 16;
+    final int originalTileSize = 16; // 16x16 tile size
     final int scale = 3;
 
-    public final int tileSize = originalTileSize * scale;  // 48*48
+    public final int tileSize = originalTileSize * scale;  // 48x48 tile
     public final int maxScreenCol = 16;
     public final int maxScreenRow = 12;
     public final int screenWidth = tileSize * maxScreenCol; // 768 pixels
     public final int screenHeight = tileSize * maxScreenRow; // 576 pixels
 
-    // World Settings
-    public final int maxWorldCol = 30;
-    public final int maxWorldRow = 30;
+    // WORLD SETTINGS
+    public final int maxWorldCol = 50;
+    public final int maxWorldRow = 50;
     public final int worldWidth = tileSize * maxWorldCol;
     public final int worldHeight = tileSize * maxWorldRow;
 
+    // FPS
     int FPS = 60;
 
+    // SYSTEM
     public TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
     Thread gameThread;
-
     public CollisionChecker cChecker = new CollisionChecker(this);
-
     public AssetSetter aSetter = new AssetSetter(this);
-
     public Player player = new Player(this, keyH);
-
     public SuperObject obj[] = new SuperObject[10];
 
     // Multiplayer variables
     private Map<String, int[]> otherPlayers = new ConcurrentHashMap<>(); // Thread-safe map for other players
-    private GameClient client; // Client reference for networking
+    private GameClient client;
+
+    // GAME STATES
+    public static final int STATE_TITLE = 0;
+    public static final int STATE_PLAY = 1;
+    public int gameState = STATE_PLAY;
 
     public GamePanel(GameClient client) {
         this.client = client;
@@ -74,12 +77,11 @@ public class GamePanel extends JPanel implements Runnable {
         double delta = 0;
         long timer = 0;
         int drawCount = 0;
-        long currentTime;
         long lastTime = System.nanoTime();
+        long currentTime;
 
         while (gameThread != null) {
             currentTime = System.nanoTime();
-
             delta += (currentTime - lastTime) / drawInterval;
             timer += (currentTime - lastTime);
             lastTime = currentTime;
@@ -90,6 +92,7 @@ public class GamePanel extends JPanel implements Runnable {
                 delta--;
                 drawCount++;
             }
+
             if (timer >= 1000000000) {
                 System.out.println("FPS:" + drawCount);
                 drawCount = 0;
@@ -103,7 +106,11 @@ public class GamePanel extends JPanel implements Runnable {
 
         // Send player's position to the server
         if (client != null) {
-            client.sendMove(player.worldX, player.worldY);
+            try {
+                client.sendMove(player.worldX, player.worldY);
+            } catch (Exception e) {
+                System.out.println("Failed to send player move to server: " + e.getMessage());
+            }
         }
     }
 
@@ -114,32 +121,38 @@ public class GamePanel extends JPanel implements Runnable {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-
         Graphics2D g2 = (Graphics2D) g;
 
+        if (gameState == STATE_PLAY) {
+            drawGame(g2);
+        }
+
+        g2.dispose();
+    }
+
+    public void drawGame(Graphics2D g2) {
         // Draw tiles
         tileM.draw(g2);
 
         // Draw other players
-        for (int[] position : otherPlayers.values()) {
+        for (Map.Entry<String, int[]> entry : otherPlayers.entrySet()) {
+            int[] position = entry.getValue();
             int worldX = position[0];
             int worldY = position[1];
 
-            // Calculate screen positions relative to the local player's position
+            // Calculate screen position relative to the player's position
             int screenX = worldX - player.worldX + player.screenX;
             int screenY = worldY - player.worldY + player.screenY;
 
-            // Only draw players that are visible on the screen
+            // Only draw players within the screen bounds
             if (screenX + tileSize > 0 && screenX < screenWidth &&
                 screenY + tileSize > 0 && screenY < screenHeight) {
                 g2.setColor(Color.BLUE);
-                g2.fillRect(screenX, screenY, tileSize, tileSize); // Draw other players as blue squares
+                g2.fillRect(screenX, screenY, tileSize, tileSize); // Draw as blue squares
             }
         }
 
-        // Draw the local player
+        // Draw local player
         player.draw(g2);
-
-        g2.dispose();
     }
 }
