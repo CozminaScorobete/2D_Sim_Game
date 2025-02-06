@@ -7,11 +7,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import main.GamePanel;
 
 public class GameClient {
-    private Socket socket;
+    public Socket socket;
     private PrintWriter out;
     private BufferedReader in;
     private GamePanel gamePanel;
-    private Map<String, int[]> otherPlayers = new ConcurrentHashMap<>(); // Thread-safe map for other players
+    private final Map<String, int[]> otherPlayers = new ConcurrentHashMap<>();
 
     public GameClient(String host, int port) {
         try {
@@ -21,7 +21,9 @@ public class GameClient {
 
             new Thread(new ServerListener()).start();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Error connecting to server: " + e.getMessage());
+            socket = null;
+            out = null;
         }
     }
 
@@ -30,14 +32,16 @@ public class GameClient {
     }
 
     public void sendMove(int x, int y) {
-        out.println("MOVE," + x + "," + y);
+        if (out != null) {
+            out.println("MOVE," + x + "," + y);
+        }
     }
 
     private class ServerListener implements Runnable {
         @Override
         public void run() {
-            String message;
             try {
+                String message;
                 while ((message = in.readLine()) != null) {
                     parseGameState(message);
                 }
@@ -48,7 +52,7 @@ public class GameClient {
     }
 
     private void parseGameState(String gameState) {
-        otherPlayers.clear(); // Clear old data
+        otherPlayers.clear();
         String[] players = gameState.split(";");
         for (String playerData : players) {
             String[] data = playerData.split(",");
@@ -59,6 +63,7 @@ public class GameClient {
                 otherPlayers.put(playerId, new int[]{x, y});
             }
         }
+
         if (gamePanel != null) {
             gamePanel.setOtherPlayers(otherPlayers);
         }
