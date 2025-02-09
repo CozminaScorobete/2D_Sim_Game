@@ -32,7 +32,7 @@ public class GameServer {
     }
 
     public synchronized void updatePlayer(String playerId, PlayerState state) {
-        System.out.println("Updating player: " + playerId + " to position (" + state.x + ", " + state.y + ")");
+       // System.out.println("Updating player: " + playerId + " to position (" + state.x + ", " + state.y + ")");
         players.put(playerId, state);
         broadcastGameState();
     }
@@ -43,7 +43,7 @@ public class GameServer {
     }
 
     private synchronized void broadcastGameState() {
-        System.out.println("Broadcasting game state to clients...");
+       // System.out.println("Broadcasting game state to clients...");
         StringBuilder gameState = new StringBuilder();
         for (Map.Entry<String, PlayerState> entry : players.entrySet()) {
             PlayerState state = entry.getValue();
@@ -61,7 +61,7 @@ public class GameServer {
         GameServer server = new GameServer(12325);
         server.start();
     }
-
+//This is a coommet
     private class ClientHandler implements Runnable {
         private final Socket socket;
         private final GameServer server;

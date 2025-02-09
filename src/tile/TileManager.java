@@ -28,32 +28,47 @@ public class TileManager {
 	}
 	
 	public void getTileImage() {
-		
-		try {
-			
-			tile[3] = new Tile();
-			tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/gras.png"));
-			
-			tile[0] = new Tile();
-			tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/dirt.png"));
-			
-			tile[4] = new Tile();
-			tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
-			tile[4].collision = true;
-			
-			tile[4].collision = true;
-			
-			tile[1] = new Tile();
-			tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
-			tile[1].collision = true;
-			
-			tile[2] = new Tile();
-			tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/sand.png"));
-		}catch(IOException e) {
-			e.printStackTrace();
-		}
-		
+	    try {
+	        System.out.println("Loading tile images...");
+
+	        // Grass
+	        tile[3] = new Tile();
+	        System.out.println("Attempting to load: /tiles/gras.png");
+	        tile[3].image = ImageIO.read(getClass().getResourceAsStream("/tiles/gras.png"));
+
+	        // Dirt
+	        tile[0] = new Tile();
+	        System.out.println("Attempting to load: /tiles/dirt.png");
+	        tile[0].image = ImageIO.read(getClass().getResourceAsStream("/tiles/dirt.png"));
+
+	        // Water
+	        tile[4] = new Tile();
+	        System.out.println("Attempting to load: /tiles/water.png");
+	        tile[4].image = ImageIO.read(getClass().getResourceAsStream("/tiles/water.png"));
+	        tile[4].collision = true;
+
+	        // Tree
+	        tile[1] = new Tile();
+	        System.out.println("Attempting to load: /tiles/tree.png");
+	        tile[1].image = ImageIO.read(getClass().getResourceAsStream("/tiles/tree.png"));
+	        tile[1].collision = true;
+
+	        // Sand
+	        tile[2] = new Tile();
+	        System.out.println("Attempting to load: /tiles/sand.png");
+	        tile[2].image = ImageIO.read(getClass().getResourceAsStream("/tiles/sand.png"));
+
+	        System.out.println("✅ Tile images loaded successfully!");
+
+	    } catch (IOException e) {
+	        System.err.println("❌ Error loading tile images!");
+	        e.printStackTrace();
+	    } catch (NullPointerException e) {
+	        System.err.println("❌ File not found! Check if the file paths are correct.");
+	        e.printStackTrace();
+	    }
 	}
+
 	
 	public void loadMap(String filePath) {
 		
@@ -115,11 +130,7 @@ public class TileManager {
 	                screenY = worldY - (gp.worldHeight - gp.screenHeight); // Stop at the bottom edge
 	            }
 
-	            // Check if the tile is water and the player has "Cascuta"
-	            if (tileNum == 4 && gp.player.hasCascuta > 1) { // Assuming 4 represents water
-	                tile[4].collision = false;
-	                 // Decrease the player's "Cascuta"
-	            }
+	            
 
 	            // Render tile if it's visible
 	            if (screenX + gp.tileSize > 0 && screenX < gp.screenWidth &&
