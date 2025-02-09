@@ -10,7 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class WeatherFetcher {
-    private static final String API_KEY = "866958daa7a96d47b35c3285b498e8c0"; // Replace with your API key
+    private static final String API_KEY = ""; // Replace with your API key
     private static final String[] LOCATIONS = {
         "London",  // Rainy city
         "Bogota",  // Often rainy
@@ -50,7 +50,7 @@ public class WeatherFetcher {
 
     private static String fetchWeatherFromAPI(String city) {
         try {
-            String apiKey = "866958daa7a96d47b35c3285b498e8c0"; // 🔹 Make sure this is correct
+            String apiKey = ""; // 🔹 Make sure this is correct
 
             // Properly format city names with spaces (URL encode them)
             String formattedCity = city.replace(" ", "%20");
